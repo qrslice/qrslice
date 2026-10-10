@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /super/
+Disallow: /dashboard/
+Disallow: /api/
+
+Sitemap: https://qrslice.com/sitemap.xml

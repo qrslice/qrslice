@@ -1,0 +1,33 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production / Cloudflare build artifacts
+/.open-next/
+/.wrangler/
+
+# Local Environment files (NEVER commit secrets)
+.env*.local
+.env
+!.env.example
+
+# Clerk & Vercel
+.clerk/
+.vercel
+
+# TypeScript build info
+*.tsbuildinfo
+
+# OS & Archives
+.DS_Store
+Thumbs.db
+*.zip
+.antigravity/

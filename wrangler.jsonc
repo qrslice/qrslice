@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "qrslice",
+  "account_id": "23a88608113a60e46ec88bc669afdeed",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-12-30",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "vars": {
+    "NEXT_PUBLIC_CLERK_SIGN_IN_URL": "/sign-in",
+    "NEXT_PUBLIC_CLERK_SIGN_UP_URL": "/sign-up",
+    "NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL": "/",
+    "NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL": "/",
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_c291bmQtbW9sbHVzay03Nzk4LmNsZXJrLmFjY291bnRzLmRldiQ",
+    "SUPER_ADMIN_EMAILS": "suraj@qrslice.com,admin@qrslice.com",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://oueyjlvreawabcnaevpq.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_yzylqpodhpKqWCf7sF_Efg_W7fyRbh9",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_yzylqpodhpKqWCf7sF_Efg_W7fyRbh9"
+  }
+}
