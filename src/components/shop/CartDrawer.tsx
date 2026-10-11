@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useCart } from '@/lib/cart-context';
 import { ShoppingBag, X, Plus, Minus, Trash2, ArrowRight, ShieldCheck, Truck } from 'lucide-react';
 
@@ -33,7 +32,7 @@ export function CartDrawer() {
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300"
+        className="fixed inset-0 bg-[#0F0728]/60 backdrop-blur-xs transition-opacity duration-300"
         onClick={closeCart}
       />
 
@@ -42,8 +41,8 @@ export function CartDrawer() {
         {/* Header */}
         <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-white">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-              <ShoppingBag className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-violet-50 text-violet-700 border border-violet-200/80 flex items-center justify-center">
+              <ShoppingBag className="w-4 h-4 text-violet-600" />
             </div>
             <div>
               <h2 className="text-base font-bold text-slate-900">Your Cart</h2>
@@ -62,23 +61,23 @@ export function CartDrawer() {
         </div>
 
         {/* Free shipping progress banner */}
-        <div className="px-5 py-3.5 bg-purple-50/70 border-b border-purple-100/80 text-xs">
+        <div className="px-5 py-3.5 bg-violet-50/70 border-b border-violet-100 text-xs">
           {remainingForFreeShipping > 0 ? (
             <div className="flex items-center gap-2 mb-2">
-              <Truck className="w-4 h-4 text-purple-600 shrink-0" />
+              <Truck className="w-4 h-4 text-violet-600 shrink-0" />
               <p className="text-slate-700 font-medium">
-                Add <span className="text-purple-700 font-bold">₹{(remainingForFreeShipping / 100).toFixed(0)}</span> more for <span className="font-bold text-slate-900">FREE Express Delivery</span>
+                Add <span className="text-violet-700 font-bold">₹{(remainingForFreeShipping / 100).toFixed(0)}</span> more for <span className="font-bold text-slate-900">FREE Express Delivery</span>
               </p>
             </div>
           ) : (
-            <div className="flex items-center gap-2 mb-2 text-purple-700 font-bold">
-              <Truck className="w-4 h-4 text-purple-600 shrink-0" />
+            <div className="flex items-center gap-2 mb-2 text-violet-800 font-bold">
+              <Truck className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>You have unlocked FREE Pan-India Delivery!</span>
             </div>
           )}
-          <div className="w-full bg-purple-200/60 h-2 rounded-full overflow-hidden">
+          <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
             <div
-              className="bg-purple-600 h-full transition-all duration-300 rounded-full"
+              className="bg-violet-600 h-full transition-all duration-300 rounded-full"
               style={{ width: `${freeShippingProgress}%` }}
             />
           </div>
@@ -88,8 +87,8 @@ export function CartDrawer() {
         <div className="flex-1 overflow-y-auto p-5 space-y-3.5">
           {items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
-              <div className="w-16 h-16 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-2xl text-purple-600 mb-3.5">
-                <ShoppingBag className="w-8 h-8" />
+              <div className="w-16 h-16 rounded-2xl bg-violet-50 border border-violet-200/80 flex items-center justify-center text-violet-700 mb-3.5">
+                <ShoppingBag className="w-8 h-8 text-violet-600" />
               </div>
               <p className="text-slate-800 font-bold text-base mb-1">Your cart is empty</p>
               <p className="text-xs text-slate-500 mb-5 max-w-xs">
@@ -97,7 +96,7 @@ export function CartDrawer() {
               </p>
               <button
                 onClick={closeCart}
-                className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition shadow-sm shadow-purple-600/30"
+                className="px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold transition shadow-sm active:scale-95"
               >
                 Browse Products
               </button>
@@ -106,7 +105,7 @@ export function CartDrawer() {
             items.map((item) => (
               <div
                 key={item.id}
-                className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex gap-3 hover:border-purple-200 transition-colors"
+                className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs flex gap-3 hover:border-violet-500/30 transition-colors"
               >
                 {/* Thumbnail */}
                 <div className="w-16 h-16 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden relative">
@@ -133,7 +132,7 @@ export function CartDrawer() {
                         </p>
                       )}
                       {item.customBusinessName && (
-                        <p className="text-[11px] text-purple-700 font-semibold mt-0.5 truncate max-w-[190px]">
+                        <p className="text-[11px] text-violet-700 font-semibold mt-0.5 truncate max-w-[190px]">
                           &quot;{item.customBusinessName}&quot;
                         </p>
                       )}
@@ -183,16 +182,16 @@ export function CartDrawer() {
         {items.length > 0 && (
           <div className="p-5 border-t border-slate-200 bg-white space-y-4">
             {/* Coupon Code Section */}
-            <div className="bg-purple-50/60 p-3 rounded-xl border border-purple-100">
+            <div className="bg-violet-50/70 p-3 rounded-xl border border-violet-200/80">
               {appliedCoupon ? (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs font-bold">
+                    <span className="w-6 h-6 rounded-lg bg-violet-600 text-white flex items-center justify-center text-xs font-bold">
                       %
                     </span>
                     <div>
-                      <p className="text-xs font-bold text-purple-900">{appliedCoupon.code} Applied</p>
-                      <p className="text-[11px] text-purple-700">
+                      <p className="text-xs font-bold text-slate-900">{appliedCoupon.code} Applied</p>
+                      <p className="text-[11px] text-violet-700 font-medium">
                         {appliedCoupon.description} (-₹{(discountPaise / 100).toLocaleString('en-IN')})
                       </p>
                     </div>
@@ -221,11 +220,11 @@ export function CartDrawer() {
                       name="coupon"
                       type="text"
                       placeholder="Coupon Code (e.g. WELCOME10)"
-                      className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-900 uppercase font-mono placeholder:normal-case placeholder:font-sans focus:outline-hidden focus:border-purple-600"
+                      className="flex-1 px-3 py-1.5 text-xs rounded-lg border border-slate-200 bg-white text-slate-900 uppercase font-mono placeholder:normal-case placeholder:font-sans focus:outline-hidden focus:border-violet-600 focus:ring-1 focus:ring-violet-600"
                     />
                     <button
                       type="submit"
-                      className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition shrink-0"
+                      className="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg text-xs font-bold transition shrink-0 active:scale-95 shadow-xs"
                     >
                       Apply
                     </button>
@@ -260,7 +259,7 @@ export function CartDrawer() {
               </div>
               <div className="flex justify-between pt-2 border-t border-slate-100 text-sm font-extrabold text-slate-900">
                 <span>Total Amount</span>
-                <span className="text-purple-600">₹{(totalPaise / 100).toLocaleString('en-IN')}</span>
+                <span className="text-violet-900 font-black">₹{(totalPaise / 100).toLocaleString('en-IN')}</span>
               </div>
             </div>
 
@@ -268,10 +267,10 @@ export function CartDrawer() {
               <Link
                 href="/checkout"
                 onClick={closeCart}
-                className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-center flex items-center justify-center gap-2 transition-all shadow-md shadow-purple-600/25 active:scale-[0.98] text-sm"
+                className="w-full py-3 px-4 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl text-center flex items-center justify-center gap-2 transition-all shadow-md shadow-violet-600/20 active:scale-[0.98] text-sm"
               >
                 <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-violet-200" />
               </Link>
               <Link
                 href="/cart"

@@ -15,76 +15,67 @@ export interface CategoryInfo {
 
 export const CATEGORIES: CategoryInfo[] = [
   {
-    id: 'google-review',
-    slug: 'google-review',
-    name: 'Google Review Products',
-    shortName: 'Google Review Products',
-    description: 'Beautiful NFC & QR products to get more Google reviews for your business.',
-    icon: '⭐',
-    image: '/categories/google-review.png',
+    id: 'cards',
+    slug: 'cards',
+    name: 'Google Review Cards',
+    shortName: 'Review Cards',
+    description: 'Pocket and counter tap cards for instant contactless Google reviews.',
+    icon: '💳',
+    image: '/products/nfc-google-review-card.png',
   },
   {
     id: 'business-cards',
     slug: 'business-cards',
     name: 'Digital Business Cards',
-    shortName: 'Digital Business Cards',
-    description: 'Smart NFC business cards that share your contacts, socials & catalog with one tap.',
-    icon: '💳',
+    shortName: 'Business Cards',
+    description: 'Smart NFC business cards that share your contacts and socials with one tap.',
+    icon: '💼',
     image: '/categories/business-cards.png',
   },
   {
-    id: 'social-media',
-    slug: 'social-media',
-    name: 'Social Media Standees',
-    shortName: 'Social Media Standees',
-    description: 'Drive instant Instagram follows, YouTube subscribers & social engagement.',
-    icon: '📸',
-    image: '/categories/social-media.png',
+    id: 'google-review',
+    slug: 'google-review',
+    name: 'Table & Counter Standees',
+    shortName: 'Standees',
+    description: 'Durable acrylic and solid wooden display stands for counters and tables.',
+    icon: '⭐',
+    image: '/categories/google-review.png',
+  },
+  {
+    id: 'combos',
+    slug: 'combos',
+    name: 'Multi-Action Combos',
+    shortName: 'Combos',
+    description: '2-in-1 and 3-in-1 dual displays (Reviews + UPI Payments + Social Follow).',
+    icon: '⚡',
+    image: '/products/google-review-combo-pack.png',
   },
   {
     id: 'upi-payments',
     slug: 'upi-payments',
     name: 'UPI & Payment Displays',
-    shortName: 'UPI & Payment Displays',
-    description: 'Premium dual UPI QR stands for PhonePe, Google Pay, Paytm & BHIM.',
+    shortName: 'UPI Displays',
+    description: 'Premium dual UPI QR stands and stainless steel plates for PhonePe, GPay, Paytm.',
     icon: '💸',
     image: '/categories/upi-payments.png',
   },
   {
-    id: 'menu-ordering',
-    slug: 'menu-ordering',
-    name: 'Menu & Ordering Standees',
-    shortName: 'Menu & Ordering Standee',
-    description: 'Durable acrylic & wooden table QR stands for restaurant menus and contactless ordering.',
-    icon: '🍽️',
-    image: '/categories/menu-ordering.png',
-  },
-  {
-    id: 'custom-products',
-    slug: 'custom-products',
-    name: 'Custom Products',
-    shortName: 'Custom Products',
-    description: 'Custom-designed acrylic and metal display signs with your full brand identity.',
-    icon: '✨',
-    image: '/categories/custom-products.png',
-  },
-  {
-    id: 'gifts-lifestyle',
-    slug: 'gifts-lifestyle',
-    name: 'Gifts & Lifestyle',
-    shortName: 'Gifts & Lifestyle',
-    description: 'Personalized NFC keychains, photo plaques and commemorative desk accessories.',
-    icon: '🎁',
-    image: '/categories/gifts-lifestyle.png',
-  },
-  {
     id: 'bulk-orders',
     slug: 'bulk-orders',
-    name: 'Bulk Orders',
-    shortName: 'Bulk Orders',
-    description: 'Wholesale restaurant starter kits, multi-location bundles & enterprise packages.',
+    name: 'Bulk & Corporate Packs',
+    shortName: 'Bulk Packs',
+    description: 'Wholesale starter kits for multi-table restaurants and corporate teams.',
     icon: '📦',
     image: '/categories/bulk-orders.png',
+  },
+  {
+    id: 'accessories',
+    slug: 'accessories',
+    name: 'Mounts & Accessories',
+    shortName: 'Accessories',
+    description: 'Wall and mirror mount plates, adhesive table pucks, and durable tags.',
+    icon: '🔧',
+    image: '/products/metal-google-review-plate.png',
   },
 ];
 
@@ -129,6 +120,31 @@ export interface ShopProduct {
   nfcSupport?: boolean;
   qrSupport?: boolean;
   isCustomizable?: boolean;
+  customizationZones?: CustomizationZoneConfig;
+}
+
+export interface CustomizationZoneConfig {
+  nameZone?: {
+    topPercent: number;
+    leftPercent: number;
+    widthPercent: number;
+    maxFontSizePx?: number;
+    textAlign?: 'center' | 'left' | 'right';
+    textColor?: string;
+  };
+  logoZone?: {
+    topPercent: number;
+    leftPercent: number;
+    widthPercent: number;
+    heightPercent?: number;
+  };
+  qrZone?: {
+    topPercent: number;
+    leftPercent: number;
+    widthPercent: number;
+    heightPercent?: number;
+  };
+  previewType?: 'standee' | 'card' | 'plate' | 'combo';
 }
 
 export interface CartItem {
@@ -221,8 +237,8 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Acrylic',
     color: 'white',
     image: '/products/acrylic-google-review-standee.png',
-    badge: 'Bestseller',
-    badgeColor: 'amber',
+    badge: 'Cast Acrylic',
+    badgeColor: 'purple',
     isFeatured: true,
     nfcSupport: true,
     qrSupport: true,
@@ -261,7 +277,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Acrylic',
     color: 'white',
     image: '/products/instagram-follow-acrylic-standee.png',
-    badge: 'Popular 2-in-1',
+    badge: '2-in-1 Dual',
     badgeColor: 'purple',
     isFeatured: true,
     nfcSupport: true,
@@ -300,7 +316,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Acrylic',
     color: 'purple',
     image: '/products/upi-payment-qr-standee.png',
-    badge: 'Best Value 3-in-1',
+    badge: '3-in-1 Multi',
     badgeColor: 'amber',
     isFeatured: true,
     nfcSupport: true,
@@ -407,7 +423,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'PVC',
     color: 'black',
     image: '/products/nfc-google-review-card.png',
-    badge: 'Customizable',
+    badge: 'Matte PVC',
     badgeColor: 'purple',
     isFeatured: false,
     nfcSupport: true,
@@ -503,7 +519,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Acrylic',
     color: 'black',
     image: '/products/google-review-combo-pack.png',
-    badge: 'Combo Offer',
+    badge: 'Combo Pack',
     badgeColor: 'purple',
     isFeatured: false,
     nfcSupport: true,
@@ -684,7 +700,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Metal',
     color: 'black',
     image: '/products/nfc-business-card-pvc.png',
-    badge: 'Luxury',
+    badge: 'Matte Steel',
     badgeColor: 'amber',
     isFeatured: false,
     nfcSupport: true,
@@ -719,7 +735,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Wooden',
     color: 'gold',
     image: '/categories/business-cards.png',
-    badge: 'Eco-Friendly',
+    badge: 'Solid Bamboo',
     badgeColor: 'emerald',
     isFeatured: false,
     nfcSupport: true,
@@ -784,7 +800,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Acrylic',
     color: 'white',
     image: '/categories/social-media.png',
-    badge: 'Popular',
+    badge: '3-in-1 Display',
     badgeColor: 'purple',
     isFeatured: false,
     nfcSupport: true,
@@ -849,7 +865,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Metal',
     color: 'white',
     image: '/categories/upi-payments.png',
-    badge: 'Heavy Duty',
+    badge: 'Stainless Steel',
     badgeColor: 'amber',
     isFeatured: false,
     nfcSupport: false,
@@ -946,7 +962,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Acrylic',
     color: 'purple',
     image: '/categories/custom-products.png',
-    badge: 'Custom Made',
+    badge: 'Laser Cut',
     badgeColor: 'purple',
     isFeatured: false,
     nfcSupport: true,
@@ -1009,7 +1025,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Acrylic',
     color: 'black',
     image: '/categories/gifts-lifestyle.png',
-    badge: 'Top Gift',
+    badge: 'Acrylic Plaque',
     badgeColor: 'rose',
     isFeatured: false,
     nfcSupport: true,
@@ -1043,7 +1059,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'Wooden',
     color: 'gold',
     image: '/categories/bulk-orders.png',
-    badge: 'Bulk Savings',
+    badge: '10-Table Kit',
     badgeColor: 'purple',
     isFeatured: false,
     nfcSupport: true,
@@ -1075,7 +1091,7 @@ const RAW_PRODUCTS: ShopProduct[] = [
     material: 'PVC',
     color: 'black',
     image: '/categories/business-cards.png',
-    badge: 'Enterprise',
+    badge: '25-Card Pack',
     badgeColor: 'blue',
     isFeatured: false,
     nfcSupport: true,
@@ -1113,9 +1129,111 @@ export function getProductBySlug(slug: string): ShopProduct | undefined {
   return INITIAL_PRODUCTS.find((p) => p.slug === slug);
 }
 
+export function getProductCustomizationZones(product: ShopProduct): CustomizationZoneConfig {
+  if (product.customizationZones) {
+    return product.customizationZones;
+  }
+
+  const slug = product.slug;
+  const isCombo = slug.includes('combo') || slug.includes('2-in-1') || slug.includes('3-in-1');
+  const isCard = product.categorySlug === 'cards' || product.categorySlug === 'business-cards';
+  const isPlate = slug.includes('plate') || slug.includes('wall');
+
+  if (isCombo) {
+    return {
+      previewType: 'combo',
+      nameZone: {
+        topPercent: 50,
+        leftPercent: 50,
+        widthPercent: 78,
+        maxFontSizePx: 16,
+        textAlign: 'center',
+        textColor: '#FFFFFF',
+      },
+      logoZone: {
+        topPercent: 25,
+        leftPercent: 50,
+        widthPercent: 20,
+        heightPercent: 15,
+      },
+    };
+  }
+
+  if (isCard) {
+    return {
+      previewType: 'card',
+      nameZone: {
+        topPercent: 62,
+        leftPercent: 50,
+        widthPercent: 80,
+        maxFontSizePx: 16,
+        textAlign: 'center',
+        textColor: '#F3E5AB',
+      },
+      logoZone: {
+        topPercent: 30,
+        leftPercent: 50,
+        widthPercent: 26,
+        heightPercent: 18,
+      },
+    };
+  }
+
+  if (isPlate) {
+    return {
+      previewType: 'plate',
+      nameZone: {
+        topPercent: 56,
+        leftPercent: 50,
+        widthPercent: 74,
+        maxFontSizePx: 16,
+        textAlign: 'center',
+        textColor: '#E0F2FE',
+      },
+      logoZone: {
+        topPercent: 26,
+        leftPercent: 50,
+        widthPercent: 22,
+        heightPercent: 16,
+      },
+    };
+  }
+
+  // Standard Acrylic or Wooden Standee
+  return {
+    previewType: 'standee',
+    nameZone: {
+      topPercent: 54,
+      leftPercent: 50,
+      widthPercent: 74,
+      maxFontSizePx: 18,
+      textAlign: 'center',
+      textColor: '#FFFFFF',
+    },
+    logoZone: {
+      topPercent: 24,
+      leftPercent: 50,
+      widthPercent: 24,
+      heightPercent: 16,
+    },
+  };
+}
+
 export function getProductsByCategory(categorySlug: string): ShopProduct[] {
   if (categorySlug === 'all') return INITIAL_PRODUCTS;
-  return INITIAL_PRODUCTS.filter((p) => p.categorySlug === categorySlug);
+  if (categorySlug === 'cards') {
+    return INITIAL_PRODUCTS.filter((p) => p.category === 'cards');
+  }
+  if (categorySlug === 'combos') {
+    return INITIAL_PRODUCTS.filter((p) => p.slug.includes('combo') || p.title.toLowerCase().includes('combo') || p.title.toLowerCase().includes('2-in-1') || p.title.toLowerCase().includes('3-in-1'));
+  }
+  if (categorySlug === 'accessories') {
+    return INITIAL_PRODUCTS.filter((p) => p.category === 'plaques' || p.category === 'tags');
+  }
+  if (categorySlug === 'standees') {
+    return INITIAL_PRODUCTS.filter((p) => p.category === 'standees');
+  }
+  return INITIAL_PRODUCTS.filter((p) => p.categorySlug === categorySlug || p.category === categorySlug);
 }
 
 export function generateOrderNumber(): string {

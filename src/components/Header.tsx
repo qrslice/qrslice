@@ -70,47 +70,54 @@ export function Header({ className = '' }: HeaderProps) {
           <nav className="hidden lg:flex items-center space-x-1">
             <Link
               href="/products"
-              className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold transition-all flex items-center gap-1.5 ${
                 isProductsActive
-                  ? 'text-purple-700 bg-purple-100/70 shadow-xs'
-                  : 'text-slate-700 hover:text-purple-600 hover:bg-slate-50'
+                  ? 'text-violet-700 bg-violet-50 border border-violet-200/80 shadow-xs'
+                  : 'text-slate-700 hover:text-violet-700 hover:bg-violet-50/60'
               }`}
             >
               <span>Products</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-600" />
+            </Link>
+
+            <Link
+              href="/products?category=cards"
+              className="px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold text-slate-700 hover:text-violet-700 hover:bg-violet-50/60 transition-colors"
+            >
+              Cards
             </Link>
 
             <Link
               href="/products?category=google-review"
-              className="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:text-purple-600 hover:bg-slate-50 transition-colors"
+              className="px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold text-slate-700 hover:text-violet-700 hover:bg-violet-50/60 transition-colors"
             >
-              Google Reviews
+              Standees
             </Link>
 
             <Link
-              href="/products?category=business-cards"
-              className="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:text-purple-600 hover:bg-slate-50 transition-colors"
+              href="/products?category=combos"
+              className="px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold text-slate-700 hover:text-violet-700 hover:bg-violet-50/60 transition-colors"
             >
-              Business Cards
+              Combos
             </Link>
 
             <Link
               href="/tools"
-              className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold transition-colors flex items-center gap-1.5 ${
                 pathname.startsWith('/tools')
-                  ? 'text-purple-700 bg-purple-50'
-                  : 'text-slate-700 hover:text-purple-600 hover:bg-slate-50'
+                  ? 'text-violet-700 bg-violet-50 border border-violet-200/80 shadow-xs'
+                  : 'text-slate-700 hover:text-violet-700 hover:bg-violet-50/60'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
-              <span>Free QR Tools</span>
+              <Sparkles className="w-3.5 h-3.5 text-violet-600" />
+              <span>QR Tools</span>
             </Link>
 
             <Link
               href="/bulk-orders"
-              className="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:text-purple-600 hover:bg-slate-50 transition-colors"
+              className="px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold text-slate-700 hover:text-violet-700 hover:bg-violet-50/60 transition-colors"
             >
-              Bulk & Corporate
+              Bulk Orders
             </Link>
 
             {/* Resources Dropdown */}
@@ -118,54 +125,48 @@ export function Header({ className = '' }: HeaderProps) {
               <button
                 onClick={() => setResourcesOpen(!resourcesOpen)}
                 onBlur={() => setTimeout(() => setResourcesOpen(false), 200)}
-                className="px-3.5 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:text-slate-950 hover:bg-slate-50 transition-colors flex items-center gap-1"
+                className="px-3 py-2 rounded-xl text-xs xl:text-sm font-semibold text-slate-700 hover:text-slate-950 hover:bg-slate-50 transition-colors flex items-center gap-1"
               >
-                <span>Features & Tools</span>
-                <ChevronDown className="w-4 h-4 text-slate-400" />
+                <span>More</span>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
               </button>
 
               {resourcesOpen && (
                 <div className="absolute top-full left-0 mt-1.5 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95">
                   <Link
                     href="/demo/tap-simulator"
-                    className="block px-4 py-2 text-xs font-semibold text-purple-700 hover:bg-purple-50"
+                    className="block px-4 py-2 text-xs font-semibold text-violet-700 hover:bg-violet-50"
                   >
                     ⚡ Virtual NFC Tap Simulator
                   </Link>
                   <Link
                     href="/compare"
-                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700"
+                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700"
                   >
                     📐 Materials Spec Comparison
                   </Link>
                   <Link
                     href="/track-order"
-                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700"
+                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700"
                   >
                     📦 Track Manufacturing Status
-                  </Link>
-                  <Link
-                    href="/bulk-orders"
-                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700"
-                  >
-                    🏢 Corporate Multi-Customizer
                   </Link>
                   <div className="my-1 border-t border-slate-100" />
                   <Link
                     href="/about"
-                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700"
+                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700"
                   >
-                    About QrSlice
+                    About QRslice
                   </Link>
                   <Link
                     href="/faq"
-                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700"
+                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700"
                   >
                     Frequently Asked Questions
                   </Link>
                   <Link
                     href="/contact"
-                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-purple-50 hover:text-purple-700"
+                    className="block px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-violet-50 hover:text-violet-700"
                   >
                     Contact & Inquiries
                   </Link>
@@ -175,7 +176,7 @@ export function Header({ className = '' }: HeaderProps) {
           </nav>
 
           {/* 3. Search Bar with Live Suggestions */}
-          <div className="flex-1 max-w-md hidden md:block relative">
+          <div className="flex-1 max-w-sm hidden md:block relative">
             <form onSubmit={handleSearchSubmit} className="relative">
               <input
                 type="text"
@@ -183,8 +184,8 @@ export function Header({ className = '' }: HeaderProps) {
                 onFocus={() => setIsSearchFocused(true)}
                 onBlur={() => setTimeout(() => setIsSearchFocused(false), 250)}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search products (e.g. review standee, NFC card...)"
-                className="w-full pl-10 pr-4 py-2 rounded-full bg-slate-50 border border-slate-200/90 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-hidden focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all"
+                placeholder="Search products (standee, card, combo...)"
+                className="w-full pl-10 pr-4 py-2 rounded-full bg-slate-50 border border-slate-200/90 text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-hidden focus:border-violet-600 focus:ring-2 focus:ring-violet-500/20 transition-all"
               />
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </form>
@@ -201,18 +202,18 @@ export function Header({ className = '' }: HeaderProps) {
                     <Link
                       key={p.id}
                       href={`/products/${p.slug}`}
-                      className="p-2.5 flex items-center gap-3 hover:bg-purple-50/60 transition group"
+                      className="p-2.5 flex items-center gap-3 hover:bg-violet-50/60 transition group"
                     >
                       <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
                         <img src={p.image} alt={p.title} className="max-h-full max-w-full object-contain p-1" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-slate-900 group-hover:text-purple-700 truncate">
+                        <p className="text-xs font-bold text-slate-900 group-hover:text-violet-700 truncate">
                           {p.title}
                         </p>
                         <p className="text-[11px] text-slate-400 capitalize">{p.categorySlug.replace(/-/g, ' ')}</p>
                       </div>
-                      <span className="text-xs font-black text-purple-700 shrink-0">
+                      <span className="text-xs font-black text-violet-700 shrink-0">
                         ₹{(p.basePricePaise / 100).toLocaleString('en-IN')}
                       </span>
                     </Link>
@@ -220,24 +221,33 @@ export function Header({ className = '' }: HeaderProps) {
                 </div>
                 <Link
                   href={`/products?search=${encodeURIComponent(searchQuery.trim())}`}
-                  className="p-2.5 bg-slate-50 hover:bg-purple-50 text-center block text-xs font-bold text-purple-700 border-t border-slate-100 transition flex items-center justify-center gap-1.5"
+                  className="p-2.5 bg-slate-50 hover:bg-violet-50 text-center block text-xs font-bold text-violet-700 border-t border-slate-100 transition flex items-center justify-center gap-1.5"
                 >
                   <span>View all results for &quot;{searchQuery}&quot;</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 text-violet-600" />
                 </Link>
               </div>
             )}
           </div>
 
-          {/* 4. Right Controls (Account, Wishlist, Cart, Mobile Toggle) */}
+          {/* 4. Right Controls (Activate, Account, Wishlist, Cart, Mobile Toggle) */}
           <div className="flex items-center gap-1.5 sm:gap-2.5">
+            {/* Activate Card CTA */}
+            <Link
+              href="/activate"
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-violet-600 hover:bg-violet-700 text-white transition shadow-sm shadow-violet-500/20 shrink-0 active:scale-95"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-violet-200" />
+              <span>Activate</span>
+            </Link>
+
             {/* Account Action */}
             <div className="flex items-center">
               <Show when="signed-in">
                 <div className="flex items-center gap-2">
                   <Link
                     href="/account/orders"
-                    className="hidden sm:inline-flex text-xs font-semibold px-2.5 py-1.5 rounded-lg text-slate-700 hover:text-purple-700 hover:bg-purple-50 transition"
+                    className="hidden sm:inline-flex text-xs font-semibold px-2.5 py-1.5 rounded-lg text-slate-700 hover:text-violet-700 hover:bg-slate-100 transition"
                   >
                     My Orders
                   </Link>
@@ -248,7 +258,7 @@ export function Header({ className = '' }: HeaderProps) {
                 <div className="flex items-center gap-1.5">
                   <SignInButton mode="modal">
                     <button
-                      className="p-2 sm:px-3 sm:py-2 rounded-xl text-slate-700 hover:text-purple-700 hover:bg-purple-50 transition-colors flex items-center gap-1.5 text-sm font-semibold"
+                      className="p-2 sm:px-3 sm:py-2 rounded-xl text-slate-700 hover:text-violet-700 hover:bg-slate-100 transition-colors flex items-center gap-1.5 text-sm font-semibold"
                       title="Sign In / Account"
                     >
                       <User className="w-5 h-5 text-slate-600" />
@@ -257,7 +267,7 @@ export function Header({ className = '' }: HeaderProps) {
                   </SignInButton>
                   <SignUpButton mode="modal">
                     <button
-                      className="hidden md:inline-flex px-3 py-1.5 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition-colors text-xs font-semibold shadow-xs"
+                      className="hidden md:inline-flex px-3 py-1.5 rounded-xl bg-violet-600 text-white hover:bg-violet-700 transition-colors text-xs font-semibold shadow-xs"
                       title="Create Account"
                     >
                       Sign Up
@@ -285,12 +295,12 @@ export function Header({ className = '' }: HeaderProps) {
             {/* Cart Trigger with Live Badge */}
             <button
               onClick={openCart}
-              className="relative p-2.5 rounded-xl text-slate-700 hover:text-purple-700 hover:bg-purple-50 transition-all group"
+              className="relative p-2.5 rounded-xl text-slate-700 hover:text-violet-700 hover:bg-slate-100 transition-all group"
               aria-label={`Shopping cart with ${totalItems} items`}
             >
               <ShoppingCart className="w-5 h-5 transition-transform group-hover:scale-105 text-slate-800" />
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-purple-600 text-white rounded-full text-[11px] font-extrabold flex items-center justify-center shadow-xs animate-in zoom-in-50">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-violet-600 text-white rounded-full text-[11px] font-extrabold flex items-center justify-center shadow-xs animate-in zoom-in-50">
                   {totalItems}
                 </span>
               )}
@@ -310,7 +320,7 @@ export function Header({ className = '' }: HeaderProps) {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-slate-100 bg-white px-4 pt-3 pb-6 space-y-3 shadow-xl">
+        <div className="lg:hidden border-t border-slate-100 bg-white px-4 pt-3 pb-6 space-y-3 shadow-xl animate-in slide-in-from-top-2 duration-200">
           {/* Mobile Search */}
           <form onSubmit={handleSearchSubmit} className="relative">
             <input
@@ -318,27 +328,47 @@ export function Header({ className = '' }: HeaderProps) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-purple-500"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           </form>
 
+          {/* Quick Activate CTA in Mobile Drawer */}
+          <Link
+            href="/activate"
+            onClick={() => setMobileMenuOpen(false)}
+            className="px-3.5 py-2.5 rounded-xl text-xs font-bold bg-violet-50 text-violet-700 border border-violet-200/80 flex items-center justify-between"
+          >
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-violet-600" />
+              <span>Activate Received Hardware</span>
+            </span>
+            <span className="text-xs font-black">→</span>
+          </Link>
+
           {/* Mobile Links */}
-          <div className="flex flex-col space-y-1 pt-2">
+          <div className="flex flex-col space-y-1 pt-1">
             <Link
               href="/products"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2.5 rounded-xl text-sm font-bold text-purple-700 bg-purple-50 flex items-center justify-between"
+              className="px-3 py-2.5 rounded-xl text-sm font-bold text-violet-900 bg-violet-50/70 flex items-center justify-between"
             >
-              <span>Explore Products</span>
-              <span className="text-xs">→</span>
+              <span>Explore All Products</span>
+              <span className="text-xs text-violet-600">→</span>
+            </Link>
+            <Link
+              href="/products?category=cards"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Google Review Cards
             </Link>
             <Link
               href="/products?category=google-review"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
-              Google Review Standees
+              Counter & Table Standees
             </Link>
             <Link
               href="/products?category=business-cards"
@@ -348,26 +378,26 @@ export function Header({ className = '' }: HeaderProps) {
               Smart Business Cards
             </Link>
             <Link
-              href="/contact"
+              href="/products?category=combos"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
-              Bulk & Corporate Orders
+              Multi-Action Combos
+            </Link>
+            <Link
+              href="/bulk-orders"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Bulk & Corporate Packs
             </Link>
             <Link
               href="/tools"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl text-sm font-bold text-purple-700 bg-purple-50/60 hover:bg-purple-50 flex items-center justify-between"
+              className="px-3 py-2 rounded-xl text-sm font-bold text-violet-800 bg-violet-50 hover:bg-violet-100 flex items-center justify-between"
             >
               <span>🛠️ Free QR Code Tools</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-600 text-white font-extrabold">NEW</span>
-            </Link>
-            <Link
-              href="/activate"
-              onClick={() => setMobileMenuOpen(false)}
-              className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              Activate Received Card
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-600 text-white font-extrabold">FREE</span>
             </Link>
             <Link
               href="/account/orders"
@@ -377,11 +407,18 @@ export function Header({ className = '' }: HeaderProps) {
               My Order History
             </Link>
             <Link
+              href="/track-order"
+              onClick={() => setMobileMenuOpen(false)}
+              className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Track Order Status
+            </Link>
+            <Link
               href="/faq"
               onClick={() => setMobileMenuOpen(false)}
               className="px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
-              FAQ & Help Center
+              Help & FAQ Center
             </Link>
           </div>
         </div>

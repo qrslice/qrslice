@@ -44,23 +44,28 @@ export function ProductCard({ product, className = '' }: ProductCardProps) {
   };
 
   const getBadgeStyle = (badge?: string) => {
-    switch (badge?.toLowerCase()) {
-      case 'bestseller':
-        return 'bg-amber-500 text-white shadow-xs';
-      case 'customizable':
-        return 'bg-purple-600 text-white shadow-xs';
-      case 'new':
-        return 'bg-rose-500 text-white shadow-xs';
-      case 'combo offer':
-        return 'bg-fuchsia-600 text-white shadow-xs';
-      default:
-        return 'bg-purple-600 text-white shadow-xs';
+    const b = badge?.toLowerCase() || '';
+    if (b === 'new') {
+      return 'bg-violet-600 text-white font-black';
     }
+    if (b.includes('dual') || b.includes('multi') || b.includes('combo')) {
+      return 'bg-[#180C38] text-violet-200 border border-violet-500/40';
+    }
+    if (b.includes('pack') || b.includes('kit')) {
+      return 'bg-slate-900 text-slate-100';
+    }
+    if (b.includes('steel') || b.includes('metal')) {
+      return 'bg-slate-800 text-slate-100';
+    }
+    if (b.includes('bamboo') || b.includes('wood')) {
+      return 'bg-[#78350F] text-amber-50';
+    }
+    return 'bg-violet-100 text-violet-800 border border-violet-200/80';
   };
 
   return (
     <div
-      className={`group relative flex flex-col rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-3.5 transition-all duration-200 hover:-translate-y-1 hover:border-purple-300 hover:shadow-xl hover:shadow-purple-500/10 ${className}`}
+      className={`group relative flex flex-col rounded-2xl border border-slate-200/90 bg-white p-3 sm:p-3.5 transition-all duration-200 hover:-translate-y-1 hover:border-violet-500/40 hover:shadow-lg hover:shadow-violet-900/5 ${className}`}
     >
       {/* Badge */}
       {product.badge && (
@@ -141,10 +146,10 @@ export function ProductCard({ product, className = '' }: ProductCardProps) {
             {/* Quick Add to Cart Button */}
             <button
               onClick={handleAddToCart}
-              className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all active:scale-90 ${
+              className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all active:scale-95 ${
                 justAdded
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-purple-50 text-purple-700 hover:bg-purple-600 hover:text-white shadow-xs'
+                  : 'bg-violet-50 text-violet-700 hover:bg-violet-600 hover:text-white shadow-xs'
               }`}
               title="Add to cart"
               aria-label={`Add ${product.title} to cart`}

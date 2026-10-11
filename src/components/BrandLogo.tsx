@@ -41,14 +41,14 @@ export function BrandLogo({
 
       {/* Styled Brand Wordmark */}
       <div className="flex items-baseline gap-1.5">
-        <span className={`font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-slate-900'} ${textSizes}`}>
-          Qr<span className="text-purple-600">Slice</span>
+        <span className={`font-extrabold tracking-tight ${isDark ? 'text-white' : 'text-[#0F0728]'} ${textSizes}`}>
+          Qr<span className={isDark ? 'text-violet-400' : 'text-violet-600'}>slice</span>
         </span>
         {subtitle && (
           <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
             isDark 
-              ? 'bg-zinc-800 text-zinc-300 border border-zinc-700/60' 
-              : 'bg-purple-50 text-purple-700 border border-purple-200'
+              ? 'bg-violet-950/80 text-violet-300 border border-violet-800/60' 
+              : 'bg-violet-50 text-violet-700 border border-violet-200/60'
           } ml-1`}>
             {subtitle}
           </span>

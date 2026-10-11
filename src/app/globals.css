@@ -9,10 +9,15 @@
   --primary-hover: #6d28d9;
   --primary-light: #f5f3ff;
   --primary-border: #ddd6fe;
+  --accent: #8b5cf6;
+  --accent-light: #ede9fe;
+  --accent-hover: #7c3aed;
   --text-main: #0f172a;
   --text-muted: #64748b;
   --card-bg: #ffffff;
   --card-border: #e2e8f0;
+  --dark-surface: #0f0728;
+  --dark-border: #261447;
 }
 
 body {
@@ -42,11 +47,19 @@ body {
 
 /* Focus styles */
 *:focus-visible {
-  outline: 2px solid #7c3aed;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-/* Prefers-reduced-motion progressive enhancement */
+/* Tactile micro-interaction utilities */
+.btn-tactile {
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+.btn-tactile:active {
+  transform: scale(0.98);
+}
+
+/* Prefers-reduced-motion safety net */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -68,4 +81,3 @@ body {
     transform: none !important;
   }
 }
-

@@ -1,71 +1,79 @@
 import React from 'react';
-import Link from 'next/link';
+import { AnnouncementBar } from '@/components/home/AnnouncementBar';
 import { Header } from '@/components/Header';
-import { PromotionalHero } from '@/components/PromotionalHero';
-import { TrustTicker } from '@/components/TrustTicker';
-import { CategoryNav } from '@/components/CategoryNav';
-import { ProductCard } from '@/components/ProductCard';
-import { HardwareShowcase } from '@/components/home/HardwareShowcase';
-import { BenefitsStrip } from '@/components/BenefitsStrip';
+import { HomeHero } from '@/components/home/HomeHero';
+import { ActivateBox } from '@/components/home/ActivateBox';
+import { HonestTrustStrip } from '@/components/home/HonestTrustStrip';
+import { CategoryGrid } from '@/components/home/CategoryGrid';
+import { ProductCarouselSection } from '@/components/home/ProductCarouselSection';
+import { HowItWorks } from '@/components/home/HowItWorks';
+import { SmartHardwareDifferentiator } from '@/components/home/SmartHardwareDifferentiator';
+import { BulkBand } from '@/components/home/BulkBand';
+import { FaqTeaser } from '@/components/home/FaqTeaser';
 import { Footer } from '@/components/Footer';
 import { INITIAL_PRODUCTS } from '@/lib/shop-service';
-import { ArrowRight, Sparkles } from 'lucide-react';
 
 export default function HomePage() {
-  // Select the 6 featured products matching input_file_0.png
+  // 1. Featured Products from real product catalog
   const featuredProducts = INITIAL_PRODUCTS.filter((p) => p.isFeatured).slice(0, 6);
 
+  // 2. New Arrivals (excluding any gifts-lifestyle)
+  const newArrivalProducts = INITIAL_PRODUCTS.filter(
+    (p) => !p.isFeatured && p.categorySlug !== 'gifts-lifestyle'
+  ).slice(0, 6);
+
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50/60 text-slate-900">
-      {/* 1. Global Navigation Bar */}
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-violet-600 selection:text-white">
+      {/* 1. Announcement Bar (One line, no hype) */}
+      <AnnouncementBar />
+
+      {/* 2. Global Navigation */}
       <Header />
 
-      {/* Ticker marquee */}
-      <TrustTicker />
+      {/* Main Content Body */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-12 sm:space-y-16">
+        {/* 3. Hero Section (Real product photography, ONE headline, ONE primary CTA) */}
+        <HomeHero />
 
-      {/* Main Page Body */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-10 sm:space-y-12">
-        {/* 2. Wide Promotional Hero with 4 Trust Badges */}
-        <PromotionalHero />
+        {/* 4. Activate Box (Top of page card lookup) */}
+        <ActivateBox />
 
-        {/* 3. Horizontal 8-Category Navigation */}
-        <section className="space-y-2">
-          <CategoryNav />
-        </section>
+        {/* 5. Honest Trust Strip (5 verified technical facts) */}
+        <HonestTrustStrip />
 
-        {/* 4. Featured Products Section */}
-        <section className="space-y-4 sm:space-y-6 pt-2">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-                Featured Products
-              </h2>
-            </div>
-            <Link
-              href="/products"
-              className="text-xs sm:text-sm font-bold text-purple-700 hover:text-purple-800 transition flex items-center gap-1 group"
-            >
-              <span>View All Products</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
+        {/* 6. 7-Category Growth Grid */}
+        <CategoryGrid />
 
-          {/* 6-Card Responsive Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </section>
+        {/* 7. Featured Hardware Section */}
+        <ProductCarouselSection
+          title="Featured Hardware"
+          subtitle="Precision-engraved standees and smart contactless cards for front desks and dining tables."
+          products={featuredProducts}
+          viewAllHref="/products"
+        />
 
-        {/* 5. Interactive Hardware Showcase & Live Metrics (GSAP) */}
-        <HardwareShowcase />
+        {/* 8. How It Works (3 clear, honest steps) */}
+        <HowItWorks />
 
-        {/* 6. Benefits Strip (Saturated Purple 5-Pillar Banner) */}
-        <BenefitsStrip className="my-8" />
+        {/* 9. Smart Hardware Differentiator (Cloud link management & feedback inbox) */}
+        <SmartHardwareDifferentiator />
+
+        {/* 9. New Arrivals Section */}
+        <ProductCarouselSection
+          title="New Arrivals"
+          subtitle="Recent additions to our physical contactless catalog."
+          products={newArrivalProducts}
+          viewAllHref="/products"
+        />
+
+        {/* 10. Bulk / B2B Band */}
+        <BulkBand />
+
+        {/* 11. FAQ Teaser */}
+        <FaqTeaser />
       </main>
 
-      {/* 7. Comprehensive Footer */}
+      {/* 12. Honest Footer */}
       <Footer />
     </div>
   );

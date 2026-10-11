@@ -9,6 +9,10 @@ import { ProductCard } from '@/components/ProductCard';
 import { ShopProduct, FinishOption, INITIAL_PRODUCTS, ProductReview } from '@/lib/shop-service';
 import { useCart } from '@/lib/cart-context';
 import { useWishlist } from '@/lib/wishlist-context';
+import { HardwareSpecsTable } from '@/components/shop/HardwareSpecsTable';
+import { CompetitorComparison } from '@/components/shop/CompetitorComparison';
+import { FulfillmentTimeline } from '@/components/shop/FulfillmentTimeline';
+import { ProductPreview } from '@/components/shop/ProductPreview';
 import {
   Star,
   ShieldCheck,
@@ -62,6 +66,15 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
   );
   const [quantity, setQuantity] = useState(1);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setShowStickyBar(window.scrollY > 420);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Review states
   const initialReviews: ProductReview[] = product.reviews || [];
@@ -114,45 +127,70 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
     router.push('/checkout');
   };
 
-  // Frequently Bought Together Partner Product
-  const comboPartner = INITIAL_PRODUCTS.find(
-    (p) => p.id !== product.id && (p.categorySlug === 'business-cards' || p.categorySlug === 'google-review')
-  ) || INITIAL_PRODUCTS[1];
+  // Frequently Bought Together Partner Product (Smart Pairing)
+  const comboPartner = React.useMemo(() => {
+    if (product.categorySlug === 'cards' || product.categorySlug === 'business-cards') {
+      return (
+        INITIAL_PRODUCTS.find((p) => p.slug === 'premium-acrylic-google-review-standee') ||
+        INITIAL_PRODUCTS.find((p) => p.categorySlug === 'google-review') ||
+        INITIAL_PRODUCTS[0]
+      );
+    }
+    return (
+      INITIAL_PRODUCTS.find((p) => p.slug === 'nfc-google-review-card') ||
+      INITIAL_PRODUCTS.find((p) => p.slug === 'matte-black-nfc-business-card') ||
+      INITIAL_PRODUCTS.find((p) => p.id !== product.id && p.categorySlug === 'cards') ||
+      INITIAL_PRODUCTS[1]
+    );
+  }, [product]);
 
-  const comboTotalPaise = unitPricePaise + comboPartner.basePricePaise;
-  const comboDiscountPaise = Math.round(comboTotalPaise * 0.15); // 15% bundle discount
-  const comboFinalPaise = comboTotalPaise - comboDiscountPaise;
+  const [includeMainInBundle, setIncludeMainInBundle] = useState(true);
+  const [includePartnerInBundle, setIncludePartnerInBundle] = useState(true);
+
+  const bothSelected = includeMainInBundle && includePartnerInBundle;
+  const bundleRawPaise =
+    (includeMainInBundle ? unitPricePaise : 0) +
+    (includePartnerInBundle ? comboPartner.basePricePaise : 0);
+  const bundleSavingsPaise = bothSelected ? Math.round(bundleRawPaise * 0.15) : 0;
+  const bundleTotalPaise = bundleRawPaise - bundleSavingsPaise;
 
   const handleAddBundleToCart = () => {
-    // Add main item
-    addItem({
-      productId: product.id,
-      title: product.title,
-      slug: product.slug,
-      image: product.image,
-      quantity: 1,
-      unitPricePaise,
-      finish: selectedFinish,
-      customBusinessName: businessName.trim(),
-      customLogoUrl: logoPreview || undefined,
-      qrUrl: destinationUrl.trim(),
-    });
-    // Add combo partner
-    addItem({
-      productId: comboPartner.id,
-      title: comboPartner.title,
-      slug: comboPartner.slug,
-      image: comboPartner.image,
-      quantity: 1,
-      unitPricePaise: comboPartner.basePricePaise - comboDiscountPaise,
-      finish: comboPartner.finishes[0] || {
-        id: 'standard',
-        name: 'Standard Finish',
-        priceModifierPaise: 0,
-        previewColor: '#ffffff',
-      },
-      customBusinessName: businessName.trim(),
-    });
+    if (!includeMainInBundle && !includePartnerInBundle) return;
+
+    if (includeMainInBundle) {
+      addItem({
+        productId: product.id,
+        title: product.title,
+        slug: product.slug,
+        image: product.image,
+        quantity: 1,
+        unitPricePaise,
+        finish: selectedFinish,
+        customBusinessName: businessName.trim(),
+        customLogoUrl: logoPreview || undefined,
+        qrUrl: resolvedQrUrl,
+      });
+    }
+
+    if (includePartnerInBundle) {
+      const partnerDiscount = bothSelected ? bundleSavingsPaise : 0;
+      addItem({
+        productId: comboPartner.id,
+        title: comboPartner.title,
+        slug: comboPartner.slug,
+        image: comboPartner.image,
+        quantity: 1,
+        unitPricePaise: comboPartner.basePricePaise - partnerDiscount,
+        finish: comboPartner.finishes[0] || {
+          id: 'standard',
+          name: 'Standard Finish',
+          priceModifierPaise: 0,
+          previewColor: '#ffffff',
+        },
+        customBusinessName: businessName.trim(),
+      });
+    }
+
     openCart();
   };
 
@@ -180,6 +218,16 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
     (p) => p.categorySlug === product.categorySlug && p.id !== product.id
   ).slice(0, 4);
 
+  const getBadgeStyle = (badge?: string) => {
+    const b = badge?.toLowerCase() || '';
+    if (b === 'new') return 'bg-violet-600 text-white font-black';
+    if (b.includes('dual') || b.includes('multi') || b.includes('combo')) return 'bg-[#180C38] text-violet-200 border border-violet-500/40';
+    if (b.includes('pack') || b.includes('kit')) return 'bg-slate-900 text-slate-100';
+    if (b.includes('steel') || b.includes('metal')) return 'bg-slate-800 text-slate-100';
+    if (b.includes('bamboo') || b.includes('wood')) return 'bg-[#78350F] text-amber-50';
+    return 'bg-violet-100 text-violet-800 border border-violet-200/80';
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/60 text-slate-900">
       <Header />
@@ -187,17 +235,17 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
       {/* Breadcrumb Bar */}
       <div className="bg-white border-b border-slate-100 py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 text-xs text-slate-500 font-medium overflow-x-auto">
-          <Link href="/" className="hover:text-purple-600 transition">
+          <Link href="/" className="hover:text-[#1E0E38] transition">
             Home
           </Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-          <Link href="/products" className="hover:text-purple-600 transition">
+          <Link href="/products" className="hover:text-[#1E0E38] transition">
             Products
           </Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
           <Link
             href={`/products?category=${product.categorySlug}`}
-            className="hover:text-purple-600 transition capitalize"
+            className="hover:text-[#1E0E38] transition capitalize"
           >
             {product.categorySlug.replace('-', ' ')}
           </Link>
@@ -208,119 +256,29 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
         </div>
       </div>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 pb-24">
         {/* Main Product Layout: 2 Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* ================= LEFT COLUMN: IMAGES & ARTWORK ================= */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="relative rounded-3xl border border-slate-200/90 bg-white p-6 sm:p-10 shadow-xs flex flex-col items-center justify-center min-h-[380px] sm:min-h-[460px] overflow-hidden">
-              {/* Product Badge */}
-              {product.badge && (
-                <div className="absolute top-5 left-5 z-10">
-                  <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-purple-600 text-white shadow-xs">
-                    {product.badge}
-                  </span>
-                </div>
-              )}
-
-              {/* Wishlist Button */}
-              <button
-                onClick={() => toggleWishlist(product.id)}
-                className={`absolute top-5 right-5 z-10 w-9 h-9 rounded-full bg-white/95 backdrop-blur-xs border shadow-xs flex items-center justify-center transition-all ${
-                  isWishlisted
-                    ? 'border-rose-200 text-rose-500'
-                    : 'border-slate-200 text-slate-400 hover:text-rose-500 hover:border-rose-200'
-                }`}
-                title={isWishlisted ? 'Saved in Wishlist' : 'Save to Wishlist'}
-                aria-label="Wishlist toggle"
-              >
-                <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-500' : ''}`} />
-              </button>
-
-              {/* Main Product Photography */}
-              <div className="relative w-full max-w-md aspect-4/3 flex items-center justify-center">
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className="max-h-full max-w-full object-contain filter drop-shadow-md transition-transform duration-300 hover:scale-105"
-                />
-
-                {/* Live Hardware Customization Overlay Card */}
-                {isDualCombo && (
-                  <div className="absolute bottom-2 inset-x-4 p-3 rounded-2xl bg-slate-950/85 backdrop-blur-md border border-slate-700/80 text-white shadow-xl text-center space-y-1.5 transition-all">
-                    <div className="flex items-center justify-between text-[10px] text-purple-300 font-extrabold uppercase tracking-wider">
-                      <span>Laser Preview</span>
-                      <span className="text-emerald-400">2-in-1 Dual QR</span>
-                    </div>
-                    <div className="text-xs font-black text-white truncate">
-                      {businessName || 'Your Business Name'}
-                    </div>
-                    <div className="grid grid-cols-2 gap-1.5 pt-1">
-                      <div className="p-1.5 rounded-lg bg-white/10 border border-white/10 flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-amber-300">⭐ Review</span>
-                        <span className="text-[8px] text-slate-300">Tap / Scan</span>
-                      </div>
-                      <div className="p-1.5 rounded-lg bg-white/10 border border-white/10 flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-pink-300">📸 Follow</span>
-                        <span className="text-[8px] text-slate-300 truncate max-w-[90px]">{instagramHandle || '@handle'}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {isTripleCombo && (
-                  <div className="absolute bottom-2 inset-x-4 p-3 rounded-2xl bg-slate-950/85 backdrop-blur-md border border-slate-700/80 text-white shadow-xl text-center space-y-1.5 transition-all">
-                    <div className="flex items-center justify-between text-[10px] text-amber-300 font-extrabold uppercase tracking-wider">
-                      <span>Laser Preview</span>
-                      <span className="text-cyan-400">3-in-1 Triple Action</span>
-                    </div>
-                    <div className="text-xs font-black text-white truncate">
-                      {businessName || 'Your Business Name'}
-                    </div>
-                    <div className="grid grid-cols-3 gap-1 pt-1">
-                      <div className="p-1 rounded-lg bg-white/10 border border-white/10 flex flex-col items-center">
-                        <span className="text-[9px] font-bold text-amber-300">⭐ Review</span>
-                        <span className="text-[7.5px] text-slate-300">NFC+QR</span>
-                      </div>
-                      <div className="p-1 rounded-lg bg-white/10 border border-white/10 flex flex-col items-center">
-                        <span className="text-[9px] font-bold text-emerald-300">💸 UPI</span>
-                        <span className="text-[7.5px] text-slate-300 truncate max-w-[65px]">{upiVpa}</span>
-                      </div>
-                      <div className="p-1 rounded-lg bg-white/10 border border-white/10 flex flex-col items-center">
-                        <span className="text-[9px] font-bold text-pink-300">📸 Social</span>
-                        <span className="text-[7.5px] text-slate-300 truncate max-w-[65px]">{instagramHandle}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {isWallPlate && (
-                  <div className="absolute bottom-2 inset-x-4 p-2.5 rounded-2xl bg-slate-950/85 backdrop-blur-md border border-cyan-800/80 text-white shadow-xl text-center space-y-1 transition-all">
-                    <div className="flex items-center justify-between text-[10px] text-cyan-300 font-extrabold uppercase tracking-wider">
-                      <span>Mirror & Wall Plate</span>
-                      <span className="text-emerald-400">3M VHB Tape</span>
-                    </div>
-                    <div className="text-xs font-black text-white truncate">
-                      {businessName || 'Your Business Name'}
-                    </div>
-                    <div className="text-[9px] text-cyan-200">
-                      Sticks securely to salon mirrors, glass doors & tiles
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Verified Hardware Chips indicator */}
-              <div className="mt-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-50 border border-purple-200 text-xs font-bold text-purple-700">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>NTAG213 High-Frequency NFC + Laser QR Code</span>
-              </div>
-            </div>
+            {/* Live Interactive Hardware Preview Studio */}
+            <ProductPreview
+              product={product}
+              businessName={businessName}
+              selectedFinish={selectedFinish}
+              logoUrl={logoPreview}
+              destinationUrl={destinationUrl}
+              instagramHandle={instagramHandle}
+              upiVpa={upiVpa}
+              isWishlisted={isWishlisted}
+              onToggleWishlist={() => toggleWishlist(product.id)}
+              badgeStyle={getBadgeStyle(product.badge)}
+            />
 
             {/* Feature Highlights Pills */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 text-center space-y-1">
-                <ShieldCheck className="w-5 h-5 text-purple-600 mx-auto" />
+                <ShieldCheck className="w-5 h-5 text-violet-600 mx-auto" />
                 <h4 className="text-xs font-bold text-slate-800">1-Year Warranty</h4>
                 <p className="text-[11px] text-slate-500">Free replacement</p>
               </div>
@@ -330,7 +288,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                 <p className="text-[11px] text-slate-500">Dispatched in 24-48 hrs</p>
               </div>
               <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 text-center space-y-1 col-span-2 sm:col-span-1">
-                <CheckCircle2 className="w-5 h-5 text-cyan-600 mx-auto" />
+                <CheckCircle2 className="w-5 h-5 text-violet-600 mx-auto" />
                 <h4 className="text-xs font-bold text-slate-800">No App Required</h4>
                 <p className="text-[11px] text-slate-500">Instant native popup</p>
               </div>
@@ -340,9 +298,9 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
             <div className="flex items-center gap-2.5 pt-1">
               <Link
                 href="/demo/tap-simulator"
-                className="flex-1 py-2.5 px-3 rounded-2xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs"
+                className="flex-1 py-2.5 px-3 rounded-2xl bg-violet-50 hover:bg-violet-100 border border-violet-200/80 text-violet-800 font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-2xs"
               >
-                <Zap className="w-3.5 h-3.5" />
+                <Zap className="w-3.5 h-3.5 text-violet-600" />
                 <span>Try Virtual NFC Tap</span>
               </Link>
               <Link
@@ -385,7 +343,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
 
               {/* Pricing Display */}
               <div className="flex items-baseline gap-3 pt-2">
-                <span className="text-3xl font-black text-purple-700">
+                <span className="text-3xl font-black text-[#1E0E38]">
                   ₹{(unitPricePaise / 100).toLocaleString('en-IN')}
                 </span>
                 {product.originalPricePaise && (
@@ -411,9 +369,9 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
                   <span>Customization Studio</span>
-                  <span className="w-2 h-2 rounded-full bg-purple-600 animate-ping" />
+                  <span className="w-2 h-2 rounded-full bg-violet-600 animate-ping" />
                 </h3>
-                <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider">
+                <span className="text-[11px] font-bold text-violet-800 uppercase tracking-wider">
                   Live Hardware Preview
                 </span>
               </div>
@@ -429,24 +387,53 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                   onChange={(e) => setBusinessName(e.target.value)}
                   placeholder="e.g. Copper Chimney Bistro"
                   maxLength={40}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-purple-600"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"
                 />
+              </div>
+
+              {/* Brand Logo Upload Option */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                  <span>Brand Logo for Laser Etching (Optional)</span>
+                  <span className="text-[10px] text-slate-400 font-normal">PNG / SVG / JPG</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl border border-dashed border-slate-300 hover:border-violet-500 bg-slate-50 hover:bg-white text-xs font-bold text-slate-700 cursor-pointer transition">
+                    <Upload className="w-3.5 h-3.5 text-violet-600" />
+                    <span>{logoPreview ? 'Change Logo File' : 'Upload Vector / PNG Logo'}</span>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/svg+xml"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  {logoPreview && (
+                    <button
+                      type="button"
+                      onClick={() => setLogoPreview(null)}
+                      className="px-3 py-2.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* 2. Destination Inputs based on Product Type */}
               {isTripleCombo ? (
-                <div className="space-y-3.5 p-3.5 rounded-2xl bg-purple-50/50 border border-purple-100">
+                <div className="space-y-3.5 p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#EADBCE]">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
                       <span>⭐ 1. Google Review URL *</span>
-                      <span className="text-[10px] text-purple-700 font-semibold">NFC + QR</span>
+                      <span className="text-[10px] text-[#1E0E38] font-semibold">NFC + QR</span>
                     </label>
                     <input
                       type="url"
                       value={destinationUrl}
                       onChange={(e) => setDestinationUrl(e.target.value)}
                       placeholder="e.g. https://g.page/r/your-place-id/review"
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-purple-600"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#1E0E38]"
                     />
                   </div>
 
@@ -460,7 +447,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                       value={upiVpa}
                       onChange={(e) => setUpiVpa(e.target.value)}
                       placeholder="e.g. shopname@okhdfcbank or merchant@paytm"
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-purple-600"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#1E0E38]"
                     />
                     <p className="text-[10px] text-slate-500">
                       Works directly with Google Pay, PhonePe, Paytm, BHIM with zero transaction fees.
@@ -477,23 +464,23 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                       value={instagramHandle}
                       onChange={(e) => setInstagramHandle(e.target.value)}
                       placeholder="e.g. @yourbrandname"
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-purple-600"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#1E0E38]"
                     />
                   </div>
                 </div>
               ) : isDualCombo ? (
-                <div className="space-y-3.5 p-3.5 rounded-2xl bg-purple-50/50 border border-purple-100">
+                <div className="space-y-3.5 p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#EADBCE]">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
                       <span>⭐ 1. Google Review URL *</span>
-                      <span className="text-[10px] text-purple-700 font-semibold">NFC + QR</span>
+                      <span className="text-[10px] text-[#1E0E38] font-semibold">NFC + QR</span>
                     </label>
                     <input
                       type="url"
                       value={destinationUrl}
                       onChange={(e) => setDestinationUrl(e.target.value)}
                       placeholder="e.g. https://g.page/r/your-place-id/review"
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-purple-600"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#1E0E38]"
                     />
                   </div>
 
@@ -507,7 +494,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                       value={instagramHandle}
                       onChange={(e) => setInstagramHandle(e.target.value)}
                       placeholder="e.g. @yourbrandname"
-                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-purple-600"
+                      className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#1E0E38]"
                     />
                   </div>
                 </div>
@@ -521,7 +508,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                     value={destinationUrl}
                     onChange={(e) => setDestinationUrl(e.target.value)}
                     placeholder="e.g. https://g.page/r/your-google-place-id/review"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-purple-600"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-violet-600 focus:ring-1 focus:ring-violet-600"
                   />
                   {isWallPlate ? (
                     <div className="p-2.5 rounded-xl bg-cyan-50 border border-cyan-200 text-[11px] text-cyan-800 space-y-0.5">
@@ -550,7 +537,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                         onClick={() => setSelectedFinish(f)}
                         className={`p-3 rounded-2xl border text-left transition-all ${
                           selectedFinish.id === f.id
-                            ? 'border-purple-600 bg-purple-50/70 shadow-xs ring-1 ring-purple-600'
+                            ? 'border-violet-600 bg-violet-50/70 shadow-xs ring-1 ring-violet-600'
                             : 'border-slate-200 hover:border-slate-300 bg-white'
                         }`}
                       >
@@ -563,7 +550,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                             {f.name}
                           </span>
                         </div>
-                        <div className="text-[11px] font-semibold text-purple-700">
+                        <div className="text-[11px] font-semibold text-violet-700">
                           {f.priceModifierPaise > 0
                             ? `+₹${f.priceModifierPaise / 100}`
                             : 'Standard'}
@@ -596,12 +583,43 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                 </div>
               </div>
 
+              {/* Volume Discount Table */}
+              <div className="p-4 rounded-2xl bg-[#FFFBF0] border border-[#F3E5AB] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>Volume Discounts</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F3E5AB] text-[#78350F] font-black">
+                      Direct Savings
+                    </span>
+                  </span>
+                  <Link href="/bulk-orders" className="text-[11px] font-bold text-violet-800 hover:underline">
+                    Need 25+? Contact B2B →
+                  </Link>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className={`p-2 rounded-xl border transition-all ${quantity < 5 ? 'bg-white border-violet-600 shadow-2xs font-bold text-slate-900' : 'bg-transparent border-[#EADBCE] text-slate-600'}`}>
+                    <p className="text-[11px] font-medium text-slate-500">1–4 Units</p>
+                    <p className="text-xs font-black text-slate-900">Standard Price</p>
+                  </div>
+                  <div className={`p-2 rounded-xl border transition-all ${quantity >= 5 && quantity < 10 ? 'bg-white border-violet-600 shadow-2xs font-bold text-slate-900' : 'bg-transparent border-[#EADBCE] text-slate-600'}`}>
+                    <p className="text-[11px] font-medium text-slate-500">5–9 Units</p>
+                    <p className="text-xs font-black text-emerald-700">10% OFF</p>
+                    <span className="text-[9px] font-mono text-slate-500 block">Use WELCOME10</span>
+                  </div>
+                  <div className={`p-2 rounded-xl border transition-all ${quantity >= 10 ? 'bg-white border-violet-600 shadow-2xs font-bold text-slate-900' : 'bg-transparent border-[#EADBCE] text-slate-600'}`}>
+                    <p className="text-[11px] font-medium text-slate-500">10+ Units</p>
+                    <p className="text-xs font-black text-emerald-700">20% OFF</p>
+                    <span className="text-[9px] font-mono text-slate-500 block">Use BULK20</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Action Buttons: Add to Cart & Buy Now */}
               <div className="space-y-2.5 pt-3 border-t border-slate-100">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
                     onClick={handleAddToCart}
-                    className="w-full py-3.5 px-5 rounded-2xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-extrabold text-sm border border-purple-200 transition-all flex items-center justify-center gap-2 active:scale-98 shadow-xs"
+                    className="w-full py-3.5 px-5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-extrabold text-sm border border-slate-200 transition-all flex items-center justify-center gap-2 active:scale-98 shadow-xs"
                   >
                     <ShoppingCart className="w-4 h-4" />
                     <span>Add to Cart</span>
@@ -609,11 +627,30 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
 
                   <button
                     onClick={handleBuyNow}
-                    className="w-full py-3.5 px-5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-sm transition-all flex items-center justify-center gap-2 shadow-md shadow-purple-600/25 active:scale-98"
+                    className="w-full py-3.5 px-5 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-extrabold text-sm transition-all flex items-center justify-center gap-2 shadow-md shadow-violet-600/20 active:scale-98"
                   >
-                    <Zap className="w-4 h-4 fill-white text-white" />
+                    <Zap className="w-4 h-4 fill-violet-200 text-violet-200" />
                     <span>Buy Now · ₹{(totalPricePaise / 100).toLocaleString('en-IN')}</span>
                   </button>
+                </div>
+
+                {/* Reassurance Strip */}
+                <div className="pt-3 grid grid-cols-3 gap-2 border-t border-slate-100 text-center">
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                    <ShieldCheck className="w-4 h-4 text-violet-600 mx-auto mb-1" />
+                    <span className="text-[11px] font-bold text-slate-900 block leading-tight">1-Yr Warranty</span>
+                    <span className="text-[9px] text-slate-500">Free replacement</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                    <Truck className="w-4 h-4 text-emerald-600 mx-auto mb-1" />
+                    <span className="text-[11px] font-bold text-slate-900 block leading-tight">Pan-India Express</span>
+                    <span className="text-[9px] text-slate-500">Dispatched in 24–48h</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70">
+                    <Sparkles className="w-4 h-4 text-violet-600 mx-auto mb-1" />
+                    <span className="text-[11px] font-bold text-slate-900 block leading-tight">Zero Reprinting</span>
+                    <span className="text-[9px] text-slate-500">Change URL anytime</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -629,7 +666,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                     key={idx}
                     className="flex items-start gap-2.5 text-xs text-slate-700"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-violet-600 shrink-0 mt-0.5" />
                     <span>{feat}</span>
                   </li>
                 ))}
@@ -644,63 +681,99 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
             <div>
               <h2 className="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
                 <span>Frequently Bought Together</span>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-extrabold uppercase border border-emerald-100">
-                  Save 15%
-                </span>
+                {bothSelected && (
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-extrabold uppercase border border-emerald-100">
+                    Save 15% Bundle Discount
+                  </span>
+                )}
               </h2>
-              <p className="text-xs text-slate-500">Pair your counter standee with a portable executive NFC card.</p>
+              <p className="text-xs text-slate-500">Pair your counter display with a portable executive card for meetings and events.</p>
             </div>
           </div>
 
           <div className="flex flex-col lg:flex-row items-center gap-6 justify-between">
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
               {/* Product 1 */}
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 w-full sm:w-72">
-                <div className="w-16 h-16 rounded-xl bg-white border border-slate-200/60 p-1 flex items-center justify-center shrink-0">
+              <label className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 w-full sm:w-80 cursor-pointer hover:bg-slate-100/70 transition">
+                <input
+                  type="checkbox"
+                  checked={includeMainInBundle}
+                  onChange={(e) => setIncludeMainInBundle(e.target.checked)}
+                  className="w-4 h-4 rounded text-violet-600 focus:ring-violet-500 border-slate-300"
+                />
+                <div className="w-14 h-14 rounded-xl bg-white border border-slate-200/60 p-1 flex items-center justify-center shrink-0">
                   <img src={product.image} alt={product.title} className="max-h-full max-w-full object-contain" />
                 </div>
                 <div className="min-w-0">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block">This Item</span>
                   <p className="text-xs font-bold text-slate-900 truncate">{product.title}</p>
-                  <p className="text-xs font-extrabold text-purple-700 mt-0.5">₹{(unitPricePaise / 100).toLocaleString('en-IN')}</p>
+                  <p className="text-xs font-extrabold text-violet-700 mt-0.5">₹{(unitPricePaise / 100).toLocaleString('en-IN')}</p>
                 </div>
-              </div>
+              </label>
 
-              <div className="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0 font-black text-sm">
+              <div className="w-8 h-8 rounded-full bg-violet-50 text-violet-700 flex items-center justify-center shrink-0 font-black text-sm">
                 +
               </div>
 
               {/* Product 2 (Partner) */}
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-100 w-full sm:w-72">
-                <div className="w-16 h-16 rounded-xl bg-white border border-slate-200/60 p-1 flex items-center justify-center shrink-0">
+              <label className="flex items-center gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 w-full sm:w-80 cursor-pointer hover:bg-slate-100/70 transition">
+                <input
+                  type="checkbox"
+                  checked={includePartnerInBundle}
+                  onChange={(e) => setIncludePartnerInBundle(e.target.checked)}
+                  className="w-4 h-4 rounded text-violet-600 focus:ring-violet-500 border-slate-300"
+                />
+                <div className="w-14 h-14 rounded-xl bg-white border border-slate-200/60 p-1 flex items-center justify-center shrink-0">
                   <img src={comboPartner.image} alt={comboPartner.title} className="max-h-full max-w-full object-contain" />
                 </div>
                 <div className="min-w-0">
+                  <span className="text-[10px] uppercase font-bold text-violet-600 block">Recommended Pair</span>
                   <p className="text-xs font-bold text-slate-900 truncate">{comboPartner.title}</p>
-                  <p className="text-xs font-extrabold text-purple-700 mt-0.5">₹{(comboPartner.basePricePaise / 100).toLocaleString('en-IN')}</p>
+                  <p className="text-xs font-extrabold text-violet-700 mt-0.5">₹{(comboPartner.basePricePaise / 100).toLocaleString('en-IN')}</p>
                 </div>
-              </div>
+              </label>
             </div>
 
             {/* Bundle Pricing & Add Button */}
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto justify-end pt-4 lg:pt-0 border-t lg:border-t-0 border-slate-100">
               <div className="text-center sm:text-right">
                 <div className="flex items-baseline gap-2 justify-center sm:justify-end">
-                  <span className="text-xl font-black text-purple-700">₹{(comboFinalPaise / 100).toLocaleString('en-IN')}</span>
-                  <span className="text-xs text-slate-400 line-through">₹{(comboTotalPaise / 100).toLocaleString('en-IN')}</span>
+                  <span className="text-xl font-black text-violet-900">₹{(bundleTotalPaise / 100).toLocaleString('en-IN')}</span>
+                  {bothSelected && (
+                    <span className="text-xs text-slate-400 line-through">₹{(bundleRawPaise / 100).toLocaleString('en-IN')}</span>
+                  )}
                 </div>
-                <p className="text-[11px] text-emerald-600 font-bold">Bundle Savings: ₹{(comboDiscountPaise / 100).toLocaleString('en-IN')}</p>
+                {bothSelected ? (
+                  <p className="text-[11px] text-emerald-600 font-bold">Bundle Savings: ₹{(bundleSavingsPaise / 100).toLocaleString('en-IN')}</p>
+                ) : (
+                  <p className="text-[11px] text-slate-500">Select both to unlock 15% savings</p>
+                )}
               </div>
 
               <button
+                disabled={!includeMainInBundle && !includePartnerInBundle}
                 onClick={handleAddBundleToCart}
-                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs transition flex items-center justify-center gap-2 shadow-md shadow-purple-600/25 active:scale-95"
+                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-violet-600 hover:bg-violet-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-extrabold text-xs transition flex items-center justify-center gap-2 shadow-md shadow-violet-600/20 active:scale-95"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add Both to Cart</span>
+                <span>
+                  {bothSelected
+                    ? `Add Both to Cart · Save ₹${(bundleSavingsPaise / 100).toLocaleString('en-IN')}`
+                    : 'Add Selected to Cart'}
+                </span>
               </button>
             </div>
           </div>
         </section>
+
+        {/* ================= HARDWARE SPECIFICATIONS ================= */}
+        <HardwareSpecsTable product={product} />
+
+        {/* ================= COMPETITOR CLARITY & PARITY ================= */}
+        <CompetitorComparison />
+
+        {/* ================= FULFILLMENT & CRAFTSMANSHIP ================= */}
+        <FulfillmentTimeline />
 
         {/* ================= CUSTOMER REVIEWS SECTION ================= */}
         <section className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-xs space-y-6">
@@ -730,7 +803,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
 
             <button
               onClick={() => setIsReviewModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs transition w-fit border border-purple-200"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition w-fit border border-slate-200"
             >
               <MessageSquare className="w-3.5 h-3.5" />
               <span>Write a Review</span>
@@ -817,7 +890,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                     value={newReviewAuthor}
                     onChange={(e) => setNewReviewAuthor(e.target.value)}
                     placeholder="e.g. Ramesh Patel"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:bg-white focus:border-[#1E0E38] focus:outline-hidden"
                   />
                 </div>
 
@@ -829,7 +902,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                     value={newReviewComment}
                     onChange={(e) => setNewReviewComment(e.target.value)}
                     placeholder="Describe how the NFC hardware or review standee performed at your store..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:bg-white focus:border-purple-600 focus:outline-hidden"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:bg-white focus:border-[#1E0E38] focus:outline-hidden"
                   />
                 </div>
 
@@ -843,7 +916,7 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition shadow-xs"
+                    className="px-4 py-2 rounded-xl bg-[#1E0E38] hover:bg-[#2B1550] text-[#FFF9F0] text-xs font-bold transition shadow-xs"
                   >
                     Submit Review
                   </button>
@@ -867,6 +940,42 @@ export function ProductDetailClient({ product }: { product: ShopProduct }) {
           </section>
         )}
       </main>
+
+      {/* Sticky Bottom Add to Cart Bar */}
+      {showStickyBar && (
+        <aside
+          aria-label="Sticky Add to Cart Bar"
+          className="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-4 shadow-xl transition-all animate-in slide-in-from-bottom duration-200"
+        >
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-12 h-12 rounded-xl bg-slate-100 p-1 border border-slate-200 shrink-0 hidden sm:flex items-center justify-center">
+                <img src={product.image} alt={product.title} className="max-h-full max-w-full object-contain" />
+              </div>
+              <div className="min-w-0">
+                <h4 className="text-xs sm:text-sm font-black text-slate-900 truncate">{product.title}</h4>
+                <p className="text-xs text-slate-500 truncate">
+                  {selectedFinish.name} · <span className="font-black text-violet-700">₹{(unitPricePaise / 100).toLocaleString('en-IN')}</span>
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={handleAddToCart}
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs transition border border-slate-200"
+              >
+                Add to Cart
+              </button>
+              <button
+                onClick={handleBuyNow}
+                className="px-5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-extrabold text-xs transition shadow-md shadow-violet-600/20 active:scale-98"
+              >
+                Buy Now · ₹{(totalPricePaise / 100).toLocaleString('en-IN')}
+              </button>
+            </div>
+          </div>
+        </aside>
+      )}
 
       <Footer />
     </div>

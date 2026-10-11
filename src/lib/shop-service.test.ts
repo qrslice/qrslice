@@ -7,6 +7,7 @@ import {
   ShippingAddressSchema,
   CustomizerSchema,
   CartItem,
+  getProductCustomizationZones,
 } from './shop-service';
 
 describe('shop-service', () => {
@@ -91,5 +92,34 @@ describe('shop-service', () => {
 
     const excessQuantity = { ...valid, quantity: 1000 };
     expect(CustomizerSchema.safeParse(excessQuantity).success).toBe(false);
+  });
+
+  it('provides bounded, valid customization zones for all products', () => {
+    for (const prod of INITIAL_PRODUCTS) {
+      const zones = getProductCustomizationZones(prod);
+      expect(zones).toBeDefined();
+      if (zones.nameZone) {
+        expect(zones.nameZone.topPercent).toBeGreaterThanOrEqual(0);
+        expect(zones.nameZone.topPercent).toBeLessThanOrEqual(100);
+        expect(zones.nameZone.leftPercent).toBeGreaterThanOrEqual(0);
+        expect(zones.nameZone.leftPercent).toBeLessThanOrEqual(100);
+        expect(zones.nameZone.widthPercent).toBeGreaterThan(0);
+        expect(zones.nameZone.widthPercent).toBeLessThanOrEqual(100);
+      }
+      if (zones.logoZone) {
+        expect(zones.logoZone.topPercent).toBeGreaterThanOrEqual(0);
+        expect(zones.logoZone.topPercent).toBeLessThanOrEqual(100);
+        expect(zones.logoZone.leftPercent).toBeGreaterThanOrEqual(0);
+        expect(zones.logoZone.leftPercent).toBeLessThanOrEqual(100);
+      }
+    }
+  });
+
+  it('guarantees zero unearned ratings and fake reviews in initial products catalog', () => {
+    for (const prod of INITIAL_PRODUCTS) {
+      expect(prod.rating).toBe(0);
+      expect(prod.reviewCount).toBe(0);
+      expect(prod.reviews?.length || 0).toBe(0);
+    }
   });
 });
